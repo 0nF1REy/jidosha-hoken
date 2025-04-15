@@ -40,6 +40,14 @@ export class SeguroService {
       return this.salvarAPI(seguro);
     } else {
       console.log('Salvar seguro no banco local');
+      const segurosPendentes = JSON.parse(
+        localStorage.getItem('segurosPendentes') || '[]'
+      );
+      segurosPendentes.push(seguro);
+      localStorage.setItem(
+        'segurosPendentes',
+        JSON.stringify(segurosPendentes)
+      );
       return of();
     }
   }
@@ -54,9 +62,22 @@ export class SeguroService {
   }
 
   private ouvirStatusConexao() {
+    console.log('Escutando status de conexão...');
+
     this.onlineOfflineService.statusConexao.subscribe((online) => {
       if (online) {
         console.log('Enviando os dados do meu banco local pra API');
+        const segurosPendentes = JSON.parse(
+          localStorage.getItem('segurosPendentes') || '[]'
+        );
+
+        segurosPendentes.forEach((seguro: Seguro) => {
+          this.salvarAPI(seguro).subscribe(() => {
+            console.log('Seguro sincronizado com sucesso:', seguro);
+          });
+        });
+
+        localStorage.removeItem('segurosPendentes');
       } else {
         console.log('Estou offline');
       }
