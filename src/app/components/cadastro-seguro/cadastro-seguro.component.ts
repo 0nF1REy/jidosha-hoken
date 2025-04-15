@@ -8,7 +8,7 @@ import { SeguroService } from '../../services/seguro.service';
 @Component({
   selector: 'app-cadastro-seguro',
   templateUrl: './cadastro-seguro.component.html',
-  styleUrl: './cadastro-seguro.component.css',
+  styleUrls: ['./cadastro-seguro.component.css'],
 })
 export class CadastroSeguroComponent implements OnInit {
   public seguro = new Seguro();
@@ -26,7 +26,14 @@ export class CadastroSeguroComponent implements OnInit {
   }
 
   cadastrar() {
-    this.seguroService.cadastrar(this.seguro);
+    this.seguroService.cadastrar(this.seguro).subscribe({
+      next: () => {
+        this.successMessage = 'Seguro cadastrado com sucesso!';
+      },
+      error: () => {
+        this.errorMessage = 'Erro ao cadastrar seguro. Tente novamente.';
+      },
+    });
   }
 
   adicionar(): void {

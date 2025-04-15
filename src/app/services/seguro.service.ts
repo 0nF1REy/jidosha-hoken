@@ -13,10 +13,17 @@ export class SeguroService {
 
   constructor(
     private http: HttpClient,
-    private OnlineOfflineService: OnlineOfflineService
-  ) {}
+    private onlineOfflineService: OnlineOfflineService
+  ) {
+    this.ouvirStatusConexao();
+  }
 
-  cadastrar(seguro: Seguro): Observable<void> {
+  private salvarAPI(seguro: Seguro): Observable<void> {
+    if (!this.onlineOfflineService.isOnline) {
+      console.log('Usuário está offline. Não é possível cadastrar o seguro.');
+      return of();
+    }
+
     return this.http.post<void>(`${this.API_SEGUROS}/seguros`, seguro).pipe(
       tap(() => {
         console.log('Seguro cadastrado com sucesso!');
@@ -28,7 +35,31 @@ export class SeguroService {
     );
   }
 
+  public cadastrar(seguro: Seguro): Observable<void> {
+    if (this.onlineOfflineService.isOnline) {
+      return this.salvarAPI(seguro);
+    } else {
+      console.log('Salvar seguro no banco local');
+      return of();
+    }
+  }
+
   listar(): Observable<Seguro[]> {
-    return this.http.get<Seguro[]>(`${this.API_SEGUROS}/seguros`); // Corrigido aqui
+    return this.http.get<Seguro[]>(`${this.API_SEGUROS}/seguros`).pipe(
+      catchError((err) => {
+        console.log('Erro ao listar seguros', err);
+        return of([]);
+      })
+    );
+  }
+
+  private ouvirStatusConexao() {
+    this.onlineOfflineService.statusConexao.subscribe((online) => {
+      if (online) {
+        console.log('Enviando os dados do meu banco local pra API');
+      } else {
+        console.log('Estou offline');
+      }
+    });
   }
 }

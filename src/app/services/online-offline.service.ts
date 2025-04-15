@@ -8,30 +8,19 @@ export class OnlineOfflineService {
   private statusConexao$ = new Subject<boolean>();
 
   constructor() {
-    console.log('OnlineOfflineService iniciado');
-
-    window.addEventListener('online', () => {
-      console.log('Está online');
-      this.atualizarStatusConexao();
-    });
-
-    window.addEventListener('offline', () => {
-      console.log('Está offline');
-      this.atualizarStatusConexao();
-    });
-
-    this.atualizarStatusConexao();
+    window.addEventListener('online', () => this.atualizarStatusConexao());
+    window.addEventListener('offline', () => this.atualizarStatusConexao());
   }
 
   get isOnline(): boolean {
-    return !!navigator.onLine;
+    return !!window.navigator.onLine;
   }
 
   get statusConexao(): Observable<boolean> {
     return this.statusConexao$.asObservable();
   }
 
-  private atualizarStatusConexao() {
+  atualizarStatusConexao() {
     this.statusConexao$.next(this.isOnline);
   }
 }
