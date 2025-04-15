@@ -67,20 +67,39 @@ export class SeguroService {
     this.onlineOfflineService.statusConexao.subscribe((online) => {
       if (online) {
         console.log('Enviando os dados do meu banco local pra API');
+
         const segurosPendentes = JSON.parse(
           localStorage.getItem('segurosPendentes') || '[]'
         );
 
-        segurosPendentes.forEach((seguro: Seguro) => {
-          this.salvarAPI(seguro).subscribe(() => {
-            console.log('Seguro sincronizado com sucesso:', seguro);
-          });
-        });
-
-        localStorage.removeItem('segurosPendentes');
+        if (segurosPendentes.length > 0) {
+          this.sincronizarSeguros(segurosPendentes);
+        } else {
+          console.log('Nenhum seguro pendente para sincronizar.');
+        }
       } else {
         console.log('Estou offline');
       }
+    });
+    this.onlineOfflineService.atualizarStatusConexao();
+  }
+
+  private sincronizarSeguros(segurosPendentes: Seguro[]) {
+    let segurosSincronizados = 0;
+
+    segurosPendentes.forEach((seguro: Seguro) => {
+      this.salvarAPI(seguro).subscribe({
+        next: () => {
+          console.log(`Seguro sincronizado com sucesso:`, seguro);
+          segurosSincronizados++;
+          if (segurosSincronizados === segurosPendentes.length) {
+            localStorage.removeItem('segurosPendentes');
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao sincronizar seguro', err);
+        },
+      });
     });
   }
 }
