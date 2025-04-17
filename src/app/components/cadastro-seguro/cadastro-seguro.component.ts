@@ -26,6 +26,7 @@ export class CadastroSeguroComponent implements OnInit {
   }
 
   cadastrar() {
+    this.seguro.id = this.seguro.placaCarro;
     this.seguroService.cadastrar(this.seguro).subscribe({
       next: () => {
         this.successMessage = 'Seguro cadastrado com sucesso!';
