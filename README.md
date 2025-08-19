@@ -1,4 +1,15 @@
-# Jidosha Hoken (自動車保険)
+<h1 align="center">
+  Jidosha Hoken (自動車保険)
+</h1>
+
+<div align="center">
+
+![Maintenance](https://img.shields.io/maintenance/yes/2025?style=for-the-badge)
+![License MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+
+</div>
+
+## 📖 Descrição
 
 Sistema de gerenciamento de seguros de automóveis desenvolvido com Angular e Node.js, com suporte offline e notificações push.
 
